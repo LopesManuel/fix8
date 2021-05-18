@@ -703,12 +703,20 @@ public:
 	/*! Print this field to the supplied stream. Used to format for FIX output.
 	  \param os stream to insert to
 	  \return stream */
-	std::ostream& print(std::ostream& os) const { return os << _value; }
+	std::ostream& print(std::ostream& os) const { return os << std::fixed << std::setprecision(_precision) << _value; }
 
 	/*! Print this field to the supplied buffer.
 	  \param to buffer to print to
 	  \return number bytes encoded */
-	size_t print(char *to) const { return modp_dtoa(_value, to, _precision); }
+	size_t print(char *to) const {
+		std::ostringstream os;
+		os << std::fixed << std::setprecision(_precision) << _value;
+		std::string s = os.str();
+		int size = s.size();
+		for(int i=0; i < size; ++i)
+			to[i] = s[i];
+		return size;
+	}
 };
 
 //-------------------------------------------------------------------------------------------------
