@@ -126,7 +126,7 @@ struct RealmBase
 /// The base field class (ABC) for all fields
 class BaseField
 {
-	const unsigned short _fnum;
+	const unsigned int _fnum;
 
 protected:
 	const RealmBase *_rlm;
@@ -135,14 +135,14 @@ public:
 	/*! Ctor.
 	  \param fnum field num for this field
 	  \param rlm pointer to the realmbase for this field (if available) */
-	BaseField(unsigned short fnum, const RealmBase *rlm=nullptr) : _fnum(fnum), _rlm(rlm) {}
+	BaseField(unsigned int fnum, const RealmBase *rlm=nullptr) : _fnum(fnum), _rlm(rlm) {}
 
 	/// Dtor.
 	virtual ~BaseField() {}
 
 	/*! Get the fix tag id of this field.
 	  \return fix tag id (field num) */
-	unsigned short get_tag() const { return _fnum; }
+	unsigned int get_tag() const { return _fnum; }
 
 	/*! Print this field to the supplied stream. Used by the Fix8 printer.
 	  \param os stream to print to
@@ -252,7 +252,7 @@ public:
 /// Field template. There will ONLY be partial template specialisations of this template.
 /*! \tparam T field type
     \tparam field field number (fix tag) */
-template<typename T, unsigned short field>
+template<typename T, unsigned int field>
 class Field : public BaseField
 {
 	Field() = delete;
@@ -264,7 +264,7 @@ class Field : public BaseField
 //-------------------------------------------------------------------------------------------------
 /// Partial specialisation for int field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<int, field> : public BaseField
 {
 protected:
@@ -273,7 +273,7 @@ protected:
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -375,7 +375,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 /// Partial specialisation for char * field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<char *, field> : public BaseField
 {
 protected:
@@ -384,7 +384,7 @@ protected:
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -486,7 +486,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 /// Partial specialisation for f8String field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<f8String, field> : public BaseField
 {
 protected:
@@ -495,7 +495,7 @@ protected:
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -592,7 +592,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 /// Partial specialisation for fp_type field type. fp_type is singe or double
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<fp_type, field> : public BaseField
 {
 protected:
@@ -602,7 +602,7 @@ protected:
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -720,9 +720,9 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-/// Partial specialisation for unsigned short field type.
+/// Partial specialisation for unsigned int field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<char, field> : public BaseField
 {
 	char _value;
@@ -730,7 +730,7 @@ class Field<char, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1037,7 +1037,7 @@ using UTCTimestamp = EnumType<FieldTrait::ft_UTCTimestamp>;
 
 /// Partial specialisation for UTCTimestamp field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<UTCTimestamp, field> : public BaseField
 {
 	Tickval _value;
@@ -1045,7 +1045,7 @@ class Field<UTCTimestamp, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1145,7 +1145,7 @@ using UTCTimeOnly = EnumType<FieldTrait::ft_UTCTimeOnly>;
 
 /// Partial specialisation for UTCTimeOnly field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<UTCTimeOnly, field> : public BaseField
 {
 	Tickval _value;
@@ -1153,7 +1153,7 @@ class Field<UTCTimeOnly, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1248,7 +1248,7 @@ using UTCDateOnly = EnumType<FieldTrait::ft_UTCDateOnly>;
 
 /// Partial specialisation for UTCDateOnly field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<UTCDateOnly, field> : public BaseField
 {
 	Tickval _value;
@@ -1256,7 +1256,7 @@ class Field<UTCDateOnly, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1351,7 +1351,7 @@ using LocalMktDate = EnumType<FieldTrait::ft_LocalMktDate>;
 
 /// Partial specialisation for LocalMktDate field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<LocalMktDate, field> : public BaseField
 {
 	Tickval _value;
@@ -1359,7 +1359,7 @@ class Field<LocalMktDate, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1454,7 +1454,7 @@ using MonthYear = EnumType<FieldTrait::ft_MonthYear>;
 
 /// Partial specialisation for MonthYear field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<MonthYear, field> : public BaseField
 {
 	size_t _sz;
@@ -1463,7 +1463,7 @@ class Field<MonthYear, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1558,7 +1558,7 @@ using TZTimeOnly = EnumType<FieldTrait::ft_TZTimeOnly>;
 
 /// Partial specialisation for TZTimeOnly field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<TZTimeOnly, field> : public BaseField
 {
 	Tickval _value;
@@ -1566,7 +1566,7 @@ class Field<TZTimeOnly, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1651,7 +1651,7 @@ using TZTimestamp = EnumType<FieldTrait::ft_TZTimestamp>;
 
 /// Partial specialisation for TZTimestamp field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<TZTimestamp, field> : public BaseField
 {
 	Tickval _value;
@@ -1659,7 +1659,7 @@ class Field<TZTimestamp, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -1744,7 +1744,7 @@ using Length = EnumType<FieldTrait::ft_Length>;
 
 /// Partial specialisation for Length field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<Length, field> : public Field<int, field>
 {
 public:
@@ -1779,7 +1779,7 @@ using TagNum = EnumType<FieldTrait::ft_TagNum>;
 
 /// Partial specialisation for TagNum field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<TagNum, field> : public Field<int, field>
 {
 public:
@@ -1814,7 +1814,7 @@ using SeqNum = EnumType<FieldTrait::ft_SeqNum>;
 
 /// Partial specialisation for SeqNum field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<SeqNum, field> : public Field<int, field>
 {
 public:
@@ -1849,7 +1849,7 @@ using NumInGroup = EnumType<FieldTrait::ft_NumInGroup>;
 
 /// Partial specialisation for NumInGroup field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<NumInGroup, field> : public Field<int, field>
 {
 public:
@@ -1884,7 +1884,7 @@ using DayOfMonth = EnumType<FieldTrait::ft_DayOfMonth>;
 
 /// Partial specialisation for DayOfMonth field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<DayOfMonth, field> : public Field<int, field>
 {
 public:
@@ -1919,7 +1919,7 @@ using Boolean = EnumType<FieldTrait::ft_Boolean>;
 
 /// Partial specialisation for Boolean field type.
 /*! \tparam field field number (fix tag) */
-template<unsigned short field>
+template<unsigned int field>
 class Field<Boolean, field> : public BaseField
 {
 	bool _value;
@@ -1927,7 +1927,7 @@ class Field<Boolean, field> : public BaseField
 
 public:
 	/// Get the FIX fieldID (tag number).
-	static unsigned short get_field_id() { return field; }
+	static unsigned int get_field_id() { return field; }
 
 	/// The FieldType
 	FieldTrait::FieldType get_underlying_type() const { return _ftype; }
@@ -2084,7 +2084,7 @@ struct BaseEntry
 {
    const Inst _create;
 	const char *_name;
-	const unsigned short _fnum;
+	const unsigned int _fnum;
 	const RealmBase *_rlm;
 	const char *_comment;
 };
@@ -2111,33 +2111,33 @@ const char Common_MsgByte_BUSINESS_REJECT('j');
 //-------------------------------------------------------------------------------------------------
 // Common FIX field numbers
 
-const unsigned short Common_BeginSeqNo(7);
-const unsigned short Common_BeginString(8);
-const unsigned short Common_BodyLength(9);
-const unsigned short Common_CheckSum(10);
-const unsigned short Common_EndSeqNo(16);
-const unsigned short Common_MsgSeqNum(34);
-const unsigned short Common_MsgType(35);
-const unsigned short Common_NewSeqNo(36);
-const unsigned short Common_PossDupFlag(43);
-const unsigned short Common_RefSeqNum(45);
-const unsigned short Common_SenderCompID(49);
-const unsigned short Common_SendingTime(52);
-const unsigned short Common_TargetCompID(56);
-const unsigned short Common_Text(58);
-const unsigned short Common_EncryptMethod(98);
-const unsigned short Common_HeartBtInt(108);
-const unsigned short Common_TestReqID(112);
-const unsigned short Common_OnBehalfOfCompID(115);
-const unsigned short Common_OnBehalfOfSubID(116);
-const unsigned short Common_OrigSendingTime(122);
-const unsigned short Common_GapFillFlag(123);
-const unsigned short Common_ResetSeqNumFlag(141);
-const unsigned short Common_OnBehalfOfLocationID(144);
-const unsigned short Common_OnBehalfOfSendingTime(370);
-const unsigned short Common_RefMsgType(372);
-const unsigned short Common_BusinessRejectReason(380);
-const unsigned short Common_DefaultApplVerID(1137);	// >= 5.0 || FIXT1.1
+const unsigned int Common_BeginSeqNo(7);
+const unsigned int Common_BeginString(8);
+const unsigned int Common_BodyLength(9);
+const unsigned int Common_CheckSum(10);
+const unsigned int Common_EndSeqNo(16);
+const unsigned int Common_MsgSeqNum(34);
+const unsigned int Common_MsgType(35);
+const unsigned int Common_NewSeqNo(36);
+const unsigned int Common_PossDupFlag(43);
+const unsigned int Common_RefSeqNum(45);
+const unsigned int Common_SenderCompID(49);
+const unsigned int Common_SendingTime(52);
+const unsigned int Common_TargetCompID(56);
+const unsigned int Common_Text(58);
+const unsigned int Common_EncryptMethod(98);
+const unsigned int Common_HeartBtInt(108);
+const unsigned int Common_TestReqID(112);
+const unsigned int Common_OnBehalfOfCompID(115);
+const unsigned int Common_OnBehalfOfSubID(116);
+const unsigned int Common_OrigSendingTime(122);
+const unsigned int Common_GapFillFlag(123);
+const unsigned int Common_ResetSeqNumFlag(141);
+const unsigned int Common_OnBehalfOfLocationID(144);
+const unsigned int Common_OnBehalfOfSendingTime(370);
+const unsigned int Common_RefMsgType(372);
+const unsigned int Common_BusinessRejectReason(380);
+const unsigned int Common_DefaultApplVerID(1137);	// >= 5.0 || FIXT1.1
 
 //-------------------------------------------------------------------------------------------------
 // Common FIX fields
