@@ -714,7 +714,7 @@ void generate_nested_group(const MessageSpec& ms, const FieldSpecMap& fspec, int
    {
       const string dspacer(depth * tabsize, ' '), d2spacer((depth + 1) * tabsize, ' ');
 
-      outh << dspacer << "GroupBase *create_nested_group(unsigned short fnum) const" << endl;
+      outh << dspacer << "GroupBase *create_nested_group(unsigned int fnum) const" << endl;
       if (ms._groups.size() > 1)
       {
          outh << dspacer << '{' << endl;
