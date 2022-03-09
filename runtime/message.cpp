@@ -97,7 +97,7 @@ unsigned MessageBase::decode(const f8String& from, unsigned s_offset, unsigned i
 
 	for (unsigned result; s_offset <= fsize && (result = extract_element(dptr + s_offset, fsize - s_offset, tag, val));)
 	{
-		unsigned short tv(fast_atoi<unsigned short>(tag));
+		unsigned int tv(fast_atoi<unsigned int>(tag));
 		Presence::const_iterator itr(_fp.get_presence().find(tv));
 		if (itr == _fp.get_presence().end())
 		{
@@ -143,8 +143,8 @@ unknown_field:
 			if (!result)
 				throw MissingMandatoryField("Unable to extract fixed width field");
 
-			const unsigned short lasttv(tv);
-			tv = fast_atoi<unsigned short>(tag);
+			const unsigned int lasttv(tv);
+			tv = fast_atoi<unsigned int>(tag);
 			if ((itr = _fp.get_presence().find(tv)) == _fp.get_presence().end())
 				goto unknown_field;
 			if (itr->_ftype != FieldTrait::ft_data || lasttv + 1 != tv) // next field must be data, tag must be 1 greater than length tag
@@ -153,7 +153,7 @@ unknown_field:
 		}
 	}
 
-	const unsigned short missing(_fp.find_missing());
+	const unsigned int missing(_fp.find_missing());
 	if (missing)
 	{
 		const BaseEntry *tbe(_ctx.find_be(missing));
@@ -166,7 +166,7 @@ unknown_field:
 }
 
 //-------------------------------------------------------------------------------------------------
-unsigned MessageBase::decode_group(GroupBase *grpbase, const unsigned short fnum, const f8String& from,
+unsigned MessageBase::decode_group(GroupBase *grpbase, const unsigned int fnum, const f8String& from,
 	unsigned s_offset, unsigned ignore)
 {
 	unsigned result;
@@ -203,7 +203,7 @@ unsigned MessageBase::decode_group(GroupBase *grpbase, const unsigned short fnum
 				s_offset = grp->decode_group(grpbase, tv, from, s_offset, ignore);
 		}
 
-		const unsigned short missing(grp->_fp.find_missing());
+		const unsigned int missing(grp->_fp.find_missing());
 		if (missing)
 		{
 			const BaseEntry *tbe(_ctx.find_be(missing));
@@ -396,7 +396,7 @@ size_t MessageBase::encode(ostream& to) const
 }
 
 //-------------------------------------------------------------------------------------------------
-size_t MessageBase::encode_group(const unsigned short fnum, char *to) const
+size_t MessageBase::encode_group(const unsigned int fnum, char *to) const
 {
 	const char *where(to);
 	GroupBase *grpbase(find_group(fnum));
@@ -408,7 +408,7 @@ size_t MessageBase::encode_group(const unsigned short fnum, char *to) const
 }
 
 //-------------------------------------------------------------------------------------------------
-size_t MessageBase::encode_group(const unsigned short fnum, std::ostream& to) const
+size_t MessageBase::encode_group(const unsigned int fnum, std::ostream& to) const
 {
 	const std::ios::pos_type where(to.tellp());
 	GroupBase *grpbase(find_group(fnum));
@@ -519,7 +519,7 @@ void MessageBase::print(ostream& os, int depth) const
 		if (!tbe)
 			throw InvalidField(pp.second->_fnum);
 		os << dspacer << tbe->_name;
-		const unsigned short comp(_fp.getComp(pp.second->_fnum));
+		const unsigned int comp(_fp.getComp(pp.second->_fnum));
 		if (comp)
 			os << " [" << _ctx._cn[comp] << ']';
 		os << " (" << pp.second->_fnum << "): ";
@@ -534,7 +534,7 @@ void MessageBase::print(ostream& os, int depth) const
 }
 
 //-------------------------------------------------------------------------------------------------
-void MessageBase::print_group(const unsigned short fnum, ostream& os, int depth) const
+void MessageBase::print_group(const unsigned int fnum, ostream& os, int depth) const
 {
 	const GroupBase *grpbase(find_group(fnum));
 	if (!grpbase)
@@ -552,7 +552,7 @@ void MessageBase::print_group(const unsigned short fnum, ostream& os, int depth)
 }
 
 //-------------------------------------------------------------------------------------------------
-void MessageBase::print_field(const unsigned short fnum, ostream& os) const
+void MessageBase::print_field(const unsigned int fnum, ostream& os) const
 {
 	Fields::const_iterator fitr(_fields.find(fnum));
 	if (fitr != _fields.end())
@@ -572,7 +572,7 @@ void MessageBase::print_field(const unsigned short fnum, ostream& os) const
 }
 
 //-------------------------------------------------------------------------------------------------
-BaseField *MessageBase::replace(const unsigned short fnum, BaseField *with)
+BaseField *MessageBase::replace(const unsigned int fnum, BaseField *with)
 {
 	BaseField *old(nullptr);
 	Fields::iterator itr(_fields.find(fnum));
@@ -597,7 +597,7 @@ BaseField *MessageBase::replace(const unsigned short fnum, BaseField *with)
 }
 
 //-------------------------------------------------------------------------------------------------
-BaseField *MessageBase::replace(const unsigned short fnum, Presence::const_iterator fitr, BaseField *with)
+BaseField *MessageBase::replace(const unsigned int fnum, Presence::const_iterator fitr, BaseField *with)
 {
 	BaseField *old(nullptr);
 	Fields::iterator itr(_fields.find(fnum));
@@ -622,7 +622,7 @@ BaseField *MessageBase::replace(const unsigned short fnum, Presence::const_itera
 }
 
 //-------------------------------------------------------------------------------------------------
-BaseField *MessageBase::remove(const unsigned short fnum)
+BaseField *MessageBase::remove(const unsigned int fnum)
 {
 	BaseField *old(nullptr);
 	Fields::iterator itr(_fields.find(fnum));
@@ -644,7 +644,7 @@ BaseField *MessageBase::remove(const unsigned short fnum)
 }
 
 //-------------------------------------------------------------------------------------------------
-BaseField *MessageBase::remove(const unsigned short fnum, Presence::const_iterator fitr)
+BaseField *MessageBase::remove(const unsigned int fnum, Presence::const_iterator fitr)
 {
 	BaseField *old(nullptr);
 	Fields::iterator itr(_fields.find(fnum));
@@ -721,7 +721,7 @@ void Message::report_codec_timings(const f8String& tag)
 #endif
 
 //-------------------------------------------------------------------------------------------------
-GroupBase *MessageBase::replace(const unsigned short fnum, GroupBase *with)
+GroupBase *MessageBase::replace(const unsigned int fnum, GroupBase *with)
 {
 	GroupBase *old(nullptr);
 	auto itr(_groups.find(fnum));

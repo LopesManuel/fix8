@@ -57,20 +57,20 @@ class GroupBase;
 using GroupElement = std::vector<MessageBase *>;
 
 //-------------------------------------------------------------------------------------------------
-using Groups = std::map<unsigned short, GroupBase *>;
+using Groups = std::map<unsigned int, GroupBase *>;
 
 /// Abstract base class for all repeating groups
 class GroupBase
 {
 	/// field number
-	unsigned short _fnum;
+	unsigned int _fnum;
 	/// vector of repeating messagebase groups
 	GroupElement _msgs;
 
 public:
 	/*! ctor
 	    \param fnum field number of this group */
-	GroupBase(const unsigned short fnum) : _fnum(fnum) {}
+	GroupBase(const unsigned int fnum) : _fnum(fnum) {}
 
 	/// dtor
 	virtual ~GroupBase() { clear(false); }
@@ -83,7 +83,7 @@ public:
 	/*! Instantiate a new nested group element.
 	    \param fnum field number of group to create
 	  \return new message or nullptr if not a valid group for this group */
-	virtual GroupBase *create_nested_group(unsigned short fnum) const { return nullptr; }
+	virtual GroupBase *create_nested_group(unsigned int fnum) const { return nullptr; }
 
 	/*! Add a message to a repeating group
 	  \param what message to add */
@@ -268,7 +268,7 @@ struct F8MetaCntx
 	/*! Get the field BaseEntry object for this field number. Will use fast field index lookup.
 	  \param fnum field to get
 	  \return ptr to BaseEntry or 0 if not found */
-	const BaseEntry *find_be(const unsigned short fnum) const
+	const BaseEntry *find_be(const unsigned int fnum) const
 		{ return fnum < _flu_sz ? _flu[fnum] : nullptr; }
 
 	/*! Get the field BaseEntry object for this field by tag. Reverse lookup.
@@ -286,8 +286,8 @@ struct F8MetaCntx
 
 	/*! Get the field number for this field by tag. Reverse lookup.
 	  \param fieldstr const char ptr to longname of field to get
-	  \return unsigned short field number */
-	unsigned short reverse_find_fnum(const char *fieldstr) const
+	  \return unsigned int field number */
+	unsigned int reverse_find_fnum(const char *fieldstr) const
 	{
 		if (fieldstr && *fieldstr)
 		{
@@ -301,7 +301,7 @@ struct F8MetaCntx
 	  \param fnum FIX field number
 	  \param from const char ptr to string containing value to construct from
 	  \return ptr to BaseField or 0 if fnum not found */
-	BaseField *create_field(unsigned short fnum, const char *from) const
+	BaseField *create_field(unsigned int fnum, const char *from) const
 	{
 		const BaseEntry *be(find_be(fnum));
 		return be ? be->_create._do(from, be->_rlm, -1) : nullptr;
@@ -365,7 +365,7 @@ struct F8MetaCntx
 	//----------------------------------------------------------------------------------------------
 	using const_iterator = const FieldTrait*;
 	using const_internal_result = std::pair<const_iterator, const_iterator>;
-	static const_iterator find(unsigned short fnum, const TraitHelper& from)
+	static const_iterator find(unsigned int fnum, const TraitHelper& from)
 	{
 		const const_internal_result res(std::equal_range (from._traits, from._traits + from._fieldcnt,
 			FieldTrait(fnum), FieldTrait::Compare()));
@@ -378,8 +378,8 @@ struct F8MetaCntx
 };
 
 //-------------------------------------------------------------------------------------------------
-using Fields = std::map <unsigned short, BaseField *>;
-using Positions = std::multimap<unsigned short, BaseField *>;
+using Fields = std::map <unsigned int, BaseField *>;
+using Positions = std::multimap<unsigned int, BaseField *>;
 
 /// Base class for all fix messages
 class MessageBase
@@ -469,7 +469,7 @@ public:
 	    \param s_offset in bytes to decode from
 	    \param ignore bytes to ignore counting back from end of message
 	    \return number of bytes consumed */
-	unsigned decode_group(GroupBase *grpbase, const unsigned short fnum, const f8String& from,
+	unsigned decode_group(GroupBase *grpbase, const unsigned int fnum, const f8String& from,
 		unsigned s_offset, unsigned ignore);
 
 	/*! Encode message to stream.
@@ -486,18 +486,18 @@ public:
 	    \param fnum repeating group fix field num (no...)
 	    \param to stream to encode to
 	    \return number of bytes encoded */
-	F8API size_t encode_group(const unsigned short fnum, std::ostream& to) const;
+	F8API size_t encode_group(const unsigned int fnum, std::ostream& to) const;
 
 	/*! Encode group message to buffer.
 	    \param fnum repeating group fix field num (no...)
 	    \param to buffer to encode to
 	    \return number of bytes encoded */
-	F8API size_t encode_group(const unsigned short fnum, char *to) const;
+	F8API size_t encode_group(const unsigned int fnum, char *to) const;
 
 	/*! Instantiate a new nested group element.
 	    \param fnum field number of group to create
 	  \return new message */
-	virtual GroupBase *create_nested_group(unsigned short fnum) const { return nullptr; }
+	virtual GroupBase *create_nested_group(unsigned int fnum) const { return nullptr; }
 
 	/*! Check to see if positions of fields are as required.
 	  \return field number of field not in order, 0 if all ok */
@@ -545,7 +545,7 @@ public:
 	    \param fnum field tag
 	    \param pos position of field in message
 	    \param what pointer to field */
-	void add_field_decoder(const unsigned short fnum, const unsigned pos, BaseField *what)
+	void add_field_decoder(const unsigned int fnum, const unsigned pos, BaseField *what)
 	{
 		_fields.insert({fnum, what});
 		_pos.insert({pos, what});
@@ -557,7 +557,7 @@ public:
 	    \param pos position of field in message
 	    \param what pointer to field
 	    \param check if false, don't check for presence */
-	void add_field(const unsigned short fnum, Presence::const_iterator itr, const unsigned pos, BaseField *what, bool check)
+	void add_field(const unsigned int fnum, Presence::const_iterator itr, const unsigned pos, BaseField *what, bool check)
 	{
 		if (check && _fp.get(fnum, itr, FieldTrait::present)) // for now, silently replace duplicate
 		{
@@ -577,7 +577,7 @@ public:
 	    \param pos position of field in message
 	    \param what pointer to field
 	    \param check if false, don't check for presence */
-	void add_field(const unsigned short fnum, Fields::iterator fitr, const unsigned pos, BaseField *what, bool check=true)
+	void add_field(const unsigned int fnum, Fields::iterator fitr, const unsigned pos, BaseField *what, bool check=true)
 	{
 		Presence::const_iterator itr(_fp.get_presence().end());
 		if (check && _fp.get(fnum, itr, FieldTrait::present)) // for now, silently replace duplicate
@@ -597,7 +597,7 @@ public:
 	    \param pos position of field in message
 	    \param what pointer to field
 	    \param check if false, don't check for presence */
-	void add_field(const unsigned short fnum, const unsigned pos, BaseField *what, bool check=true)
+	void add_field(const unsigned int fnum, const unsigned pos, BaseField *what, bool check=true)
 	{
 		Presence::const_iterator itr(_fp.get_presence().end());
 		if (check && _fp.get(fnum, itr, FieldTrait::present)) // for now, silently replace duplicate
@@ -615,7 +615,7 @@ public:
 	/*! Set field attribute to given value.
 	    \param field tag number
 	    \param type fieldtrait type */
-	void set(const unsigned short field, FieldTrait::TraitTypes type=FieldTrait::present) { _fp.set(field, type); }
+	void set(const unsigned int field, FieldTrait::TraitTypes type=FieldTrait::present) { _fp.set(field, type); }
 
 	/*! Add fix field to this message.
 	    \tparam T field type
@@ -640,7 +640,7 @@ public:
 		 \return true on success; throws InvalidField if not valid */
 	bool add_field(BaseField *what)
 	{
-		const unsigned short& fnum(what->_fnum);
+		const unsigned int& fnum(what->_fnum);
 		Presence::const_iterator itr(_fp.get_presence().end());
 		if (_fp.has(fnum, itr))
 		{
@@ -692,7 +692,7 @@ public:
 	/*! Check if a field is legal in a message.
 	    \param fnum field number
 	    \return true if present */
-	bool is_legal(unsigned short fnum) const { return _fp.has(fnum); }
+	bool is_legal(unsigned int fnum) const { return _fp.has(fnum); }
 
 	/*! Check if a field is legal.
 	    \tparam T type of field to check
@@ -726,17 +726,17 @@ public:
 	/*! Check if a field is present in this message.
 	    \param fnum field number
 	    \return true is present */
-	bool have(const unsigned short fnum) const { return _fp.get(fnum, FieldTrait::present); }
+	bool have(const unsigned int fnum) const { return _fp.get(fnum, FieldTrait::present); }
 
 	/*! Check if a field is present in this message.
 	    \param fnum field number
 	    \return iterator to field or Fields::const_iterator::end */
-	Fields::const_iterator find_field(const unsigned short fnum) const { return _fields.find(fnum); }
+	Fields::const_iterator find_field(const unsigned int fnum) const { return _fields.find(fnum); }
 
 	/*! Search for field in this message.
 	    \param fnum field number
 	    \return pointer to field or 0 if not found */
-	BaseField *get_field(const unsigned short fnum) const
+	BaseField *get_field(const unsigned int fnum) const
 	{
 		auto itr(_fields.find(fnum));
 		return itr != _fields.cend() ? itr->second : nullptr;
@@ -764,30 +764,30 @@ public:
 		 \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	    \param with field to replace with
 	    \return pointer to original field or 0 if not found */
-	F8API BaseField *replace(const unsigned short fnum, Presence::const_iterator itr, BaseField *with);
+	F8API BaseField *replace(const unsigned int fnum, Presence::const_iterator itr, BaseField *with);
 
 	/*! Replace a field value with another field value.
 	    \param fnum field number
 	    \param with field to replace with
 	    \return pointer to original field or 0 if not found */
-	F8API BaseField *replace(const unsigned short fnum, BaseField *with);
+	F8API BaseField *replace(const unsigned int fnum, BaseField *with);
 
 	/*! Replace a group with another group.
 	    \param fnum group field number
 	    \param with group to replace with
 	    \return pointer to original group or 0 if not found */
-	F8API GroupBase *replace(const unsigned short fnum, GroupBase *with);
+	F8API GroupBase *replace(const unsigned int fnum, GroupBase *with);
 
 	/*! Remove a field from this message.
 	    \param fnum field number
 		 \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	    \return pointer to original field or 0 if not found */
-	F8API BaseField *remove(const unsigned short fnum, Presence::const_iterator itr);
+	F8API BaseField *remove(const unsigned int fnum, Presence::const_iterator itr);
 
 	/*! Remove a field from this message.
 	    \param fnum field number
 	    \return pointer to original field or 0 if not found */
-	F8API BaseField *remove(const unsigned short fnum);
+	F8API BaseField *remove(const unsigned int fnum);
 
 	/*! Find a group of a specified type.
 	    \tparam T type of group to get
@@ -798,7 +798,7 @@ public:
 	/*! Find a group of a specified type.
 	    \param fnum field number
 	    \return pointer to found group or 0 if not found */
-	GroupBase *find_group(const unsigned short fnum) const
+	GroupBase *find_group(const unsigned int fnum) const
 	{
 		auto gitr(_groups.find(fnum));
 		return gitr != _groups.cend() ? gitr->second : nullptr;
@@ -815,7 +815,7 @@ public:
 	    \param fnum field number
 	    \param grpbase parent group (if group nested) or nullptr if no parent
 	    \return pointer to found group or 0 if not found */
-	GroupBase *find_add_group(const unsigned short fnum, GroupBase *grpbase=nullptr)
+	GroupBase *find_add_group(const unsigned int fnum, GroupBase *grpbase=nullptr)
 	{
 		auto gitr(_groups.find(fnum));
 		if (gitr != _groups.end())
@@ -847,7 +847,7 @@ public:
 	/*! Find the position of a field in a message.
 	    \param field field number
 	    \return position of field */
-	unsigned short getPos(const unsigned short field) const { return _fp.getPos(field); }
+	unsigned int getPos(const unsigned int field) const { return _fp.getPos(field); }
 
 	/*! Add a fieldtrait to the message.
 	    \param what FieldTrait to add
@@ -869,13 +869,13 @@ public:
 	/*! Print the field specified by the field num from message to the specified stream.
 	    \param fnum field number
 	    \param os refererence to stream to print to */
-	F8API virtual void print_field(const unsigned short fnum, std::ostream& os) const;
+	F8API virtual void print_field(const unsigned int fnum, std::ostream& os) const;
 
 	/*! Print the repeating group to the specified stream.
 	    \param fnum field number
 	    \param os refererence to stream to print to
 	    \param depth nesting depth */
-	F8API virtual void print_group(const unsigned short fnum, std::ostream& os, int depth=0) const;
+	F8API virtual void print_group(const unsigned int fnum, std::ostream& os, int depth=0) const;
 
 	/*! Get the FieldTraits
 	   \return reference to FieldTraits object */
@@ -1301,7 +1301,7 @@ public:
 	/*! Search for field in this message (either header, body or trailer).
 	    \param fnum field number
 	    \return pointer to field or 0 if not found */
-	BaseField *get_field_flattened(const unsigned short fnum) const
+	BaseField *get_field_flattened(const unsigned int fnum) const
 	{
 		auto itr (_fields.find(fnum));
 		return  itr != _fields.end() ? itr->second

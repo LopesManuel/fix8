@@ -120,7 +120,7 @@ struct FieldTrait
 	  \param field_traits bitmap of TraitTypes
 	  \param group ptr ot traits if group
 	  \param fieldcnt number of fields in group if group */
-	FieldTrait(unsigned short fnum, unsigned ftype, unsigned short pos, unsigned short compon, unsigned short field_traits
+	FieldTrait(unsigned int fnum, unsigned ftype, unsigned int pos, unsigned int compon, unsigned int field_traits
 #if defined FIX8_HAVE_EXTENDED_METADATA
 		, const FieldTrait *group=nullptr, unsigned fieldcnt=0
 #endif
@@ -133,7 +133,7 @@ struct FieldTrait
 
 	/*! Ctor.
 	  \param field field num (tag number) */
-	FieldTrait(const unsigned short field) : _fnum(field) {}
+	FieldTrait(const unsigned int field) : _fnum(field) {}
 
 	/*! Ctor.
 	  \param field field num (tag number)
@@ -143,16 +143,16 @@ struct FieldTrait
 	  \param isgroup true if this is a group
 	  \param compon component idx
 	  \param ispresent true if field is present (should be false until set). */
-	FieldTrait(const unsigned short field, const FieldType ftype, const unsigned short pos=0,
+	FieldTrait(const unsigned int field, const FieldType ftype, const unsigned int pos=0,
 		bool ismandatory=false, bool isgroup=false, const unsigned compon=0, bool ispresent=false) :
 		_fnum(field), _ftype(ftype), _pos(pos), _component(compon),
 		_field_traits((ismandatory ? 1 : 0) | (ispresent ? 1 : 0) << present
 		| (pos ? 1 : 0) << position | (isgroup ? 1 : 0) << group | (compon ? 1 : 0) << component) {}
 
-	unsigned short _fnum;
+	unsigned int _fnum;
 	FieldType _ftype;
-	mutable unsigned short _pos, _component;
-	mutable ebitset<TraitTypes, unsigned short> _field_traits;
+	mutable unsigned int _pos, _component;
+	mutable ebitset<TraitTypes, unsigned int> _field_traits;
 #if defined FIX8_HAVE_EXTENDED_METADATA
     const TraitHelper _group = TraitHelper{ nullptr, 0 };
 #endif
@@ -198,10 +198,10 @@ F8API std::ostream& operator<<(std::ostream& os, const FieldTrait& what);
 struct FieldTrait_Hash_Array
 {
    const unsigned _els, _sz;
-   unsigned short *_arr;
+   unsigned int *_arr;
 
    FieldTrait_Hash_Array(const FieldTrait *from, const size_t els)
-      : _els(static_cast<unsigned>(els)), _sz((from + _els - 1)->_fnum + 1), _arr(new unsigned short [_sz])
+      : _els(static_cast<unsigned>(els)), _sz((from + _els - 1)->_fnum + 1), _arr(new unsigned int [_sz])
    {
 		std::fill(_arr, _arr + _sz, 0);
 		for (unsigned offset(0); offset < _els; ++offset)
@@ -215,7 +215,7 @@ struct FieldTrait_Hash_Array
 /// Specialisation of Presorted set using hash array lookup
 /// Search complexity is O(1), ctor complexity approaches O(1), no insert
 template<>
-class presorted_set<unsigned short, FieldTrait, FieldTrait::Compare>
+class presorted_set<unsigned int, FieldTrait, FieldTrait::Compare>
 {
 public:
 	using iterator = FieldTrait*;
@@ -292,12 +292,12 @@ public:
 	  \param key to find
 	  \param answer true if element is found
 	  \return pointer to found element or pointer to location where element would be inserted */
-	iterator find(const unsigned short key, bool& answer) { return find(FieldTrait(key), answer); }
+	iterator find(const unsigned int key, bool& answer) { return find(FieldTrait(key), answer); }
 
 	/*! Find an element with the given key (const version)
 	  \param key to find
 	  \return pointer to found element or end() */
-	const_iterator find(const unsigned short key) const
+	const_iterator find(const unsigned int key) const
 	{
 		if (_ftha)
 			return key < _ftha->_sz && (_arr + _ftha->_arr[key])->_fnum == key ? _arr + _ftha->_arr[key] : end();
@@ -320,7 +320,7 @@ public:
 	/*! Find an element with the given key
 	  \param key to find
 	  \return pointer to found element or end() */
-	iterator find(const unsigned short key)
+	iterator find(const unsigned int key)
 	{
 		if (_ftha)
 			return key < _ftha->_sz && (_arr + _ftha->_arr[key])->_fnum == key ? _arr + _ftha->_arr[key] : end();
@@ -431,7 +431,7 @@ public:
 };
 
 //-------------------------------------------------------------------------------------------------
-using Presence = presorted_set<unsigned short, FieldTrait, FieldTrait::Compare>;
+using Presence = presorted_set<unsigned int, FieldTrait, FieldTrait::Compare>;
 
 /// A collection of FieldTraits for a message. Which fields are required, which are present.
 class FieldTraits
@@ -454,7 +454,7 @@ public:
 	  \param field to check
 	  \param itr hint iterator: set to itr of found element
 	  \return true if present */
-	bool has(const unsigned short field, Presence::const_iterator& itr) const
+	bool has(const unsigned int field, Presence::const_iterator& itr) const
 	{
 		if (itr == _presence.end())
 			itr = _presence.find(field);
@@ -464,7 +464,7 @@ public:
 	/*! Check if a field is present
 	  \param field to check
 	  \return true if present */
-	bool has(const unsigned short field) const
+	bool has(const unsigned int field) const
 	{
 		Presence::const_iterator itr(_presence.find(field));
 		return itr != _presence.end();
@@ -472,8 +472,8 @@ public:
 
 	/*! Get the traits for a field.
 	  \param field to get
-	  \return traits as an unsigned short */
-	unsigned getval(const unsigned short field)
+	  \return traits as an unsigned int */
+	unsigned getval(const unsigned int field)
 	{
 		Presence::const_iterator itr(_presence.find(field));
 		return itr != _presence.end() ? itr->_field_traits.get() : 0;
@@ -487,7 +487,7 @@ public:
 	  \param field to check
 	  \param type TraitType to check (default present)
 	  \return true if field has trait */
-	bool get(const unsigned short field, FieldTrait::TraitTypes type=FieldTrait::present) const
+	bool get(const unsigned int field, FieldTrait::TraitTypes type=FieldTrait::present) const
 	{
 		Presence::const_iterator itr(_presence.find(field));
 		return itr != _presence.end() ? itr->_field_traits.has(type) : false;
@@ -498,7 +498,7 @@ public:
 	  \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	  \param type TraitType to check (default present)
 	  \return true if field has trait */
-	bool get(const unsigned short field, Presence::const_iterator& itr, FieldTrait::TraitTypes type) const
+	bool get(const unsigned int field, Presence::const_iterator& itr, FieldTrait::TraitTypes type) const
 	{
 		if (itr != _presence.end())
 			return itr->_field_traits.has(type);
@@ -509,7 +509,7 @@ public:
 	/*! Find the first field that does not have the specified trait.
 	  \param type TraitType to check (default mandatory)
 	  \return field number of field, 0 if none */
-	unsigned short find_missing(FieldTrait::TraitTypes type=FieldTrait::mandatory) const
+	unsigned int find_missing(FieldTrait::TraitTypes type=FieldTrait::mandatory) const
 	{
 		for (Presence::const_iterator itr(_presence.begin()); itr != _presence.end(); ++itr)
 			if ((itr->_field_traits & type) && (itr->_field_traits & FieldTrait::present) == 0)
@@ -521,7 +521,7 @@ public:
 	  \param field to set
 	  \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	  \param type TraitType to set (default present) */
-	void set(const unsigned short field, Presence::const_iterator& itr, FieldTrait::TraitTypes type)
+	void set(const unsigned int field, Presence::const_iterator& itr, FieldTrait::TraitTypes type)
 	{
 		if (itr == _presence.end())
 		{
@@ -536,7 +536,7 @@ public:
 	/*! Set a trait for a specified field.
 	  \param field to set
 	  \param type TraitType to set (default present) */
-	void set(const unsigned short field, FieldTrait::TraitTypes type=FieldTrait::present)
+	void set(const unsigned int field, FieldTrait::TraitTypes type=FieldTrait::present)
 	{
 		Presence::iterator itr(_presence.find(field));
 		if (itr != _presence.end())
@@ -547,7 +547,7 @@ public:
 	  \param field to set
 	  \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	  \param type TraitType to set (default present) */
-	void clear(const unsigned short field, Presence::const_iterator& itr, FieldTrait::TraitTypes type=FieldTrait::present)
+	void clear(const unsigned int field, Presence::const_iterator& itr, FieldTrait::TraitTypes type=FieldTrait::present)
 	{
 		if (itr == _presence.end())
 		{
@@ -562,7 +562,7 @@ public:
 	/*! Clear a trait for a specified field.
 	  \param field to set
 	  \param type TraitType to set (default present) */
-	void clear(const unsigned short field, FieldTrait::TraitTypes type=FieldTrait::present)
+	void clear(const unsigned int field, FieldTrait::TraitTypes type=FieldTrait::present)
 	{
 		Presence::iterator itr(_presence.find(field));
 		if (itr != _presence.end())
@@ -588,34 +588,34 @@ public:
 	/*! Check if a specified field has the present bit set (is present).
 	  \param field field to check
 	  \return true if present */
-	bool is_present(const unsigned short field) const { return get(field, FieldTrait::present); }
+	bool is_present(const unsigned int field) const { return get(field, FieldTrait::present); }
 
 	/*! Check if a specified field has the mandator bit set.
 	  \param field field to check
 	  \return true if mandatory set */
-	bool is_mandatory(const unsigned short field) const { return get(field, FieldTrait::mandatory); }
+	bool is_mandatory(const unsigned int field) const { return get(field, FieldTrait::mandatory); }
 
 	/*! Check if a specified field has the group bit set (is a group).
 	  \param field field to check
 	  \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	  \return true if a group */
-	bool is_group(const unsigned short field, Presence::const_iterator& itr) const { return get(field, itr, FieldTrait::group); }
+	bool is_group(const unsigned int field, Presence::const_iterator& itr) const { return get(field, itr, FieldTrait::group); }
 
 	/*! Check if a specified field has the group bit set (is a group).
 	  \param field field to check
 	  \return true if a group */
-	bool is_group(const unsigned short field) const { return get(field, FieldTrait::group); }
+	bool is_group(const unsigned int field) const { return get(field, FieldTrait::group); }
 
 	/*! Check if a specified field has the component bit set (is a component).
 	  \param field field to check
 	  \return true if a component */
-	bool is_component(const unsigned short field) const { return get(field, FieldTrait::component); }
+	bool is_component(const unsigned int field) const { return get(field, FieldTrait::component); }
 
 	/*! Get the field component index of a specified field.
 	  \param field field to get
 	  \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	  \return index of component of field, 0 if not found */
-	unsigned short getComp(const unsigned short field, Presence::const_iterator& itr) const
+	unsigned int getComp(const unsigned int field, Presence::const_iterator& itr) const
 	{
 		if (itr != _presence.end())
 			return itr->_component;
@@ -626,7 +626,7 @@ public:
 	/*! Get the field component index of a specified field.
 	  \param field field to get
 	  \return index of component of field, 0 if not found */
-	unsigned short getComp(const unsigned short field) const
+	unsigned int getComp(const unsigned int field) const
 	{
 		Presence::const_iterator itr(_presence.find(field));
 		return itr != _presence.end() ? itr->_component : 0;
@@ -636,7 +636,7 @@ public:
 	  \param field field to get
 	  \param itr hint iterator: if end, set to itr of found element, if not end use it to locate element
 	  \return position of field, 0 if no pos or not found */
-	unsigned short getPos(const unsigned short field, Presence::const_iterator& itr) const
+	unsigned int getPos(const unsigned int field, Presence::const_iterator& itr) const
 	{
 		if (itr != _presence.end())
 			return itr->_field_traits.has(FieldTrait::position) ? itr->_pos : 0;
@@ -647,7 +647,7 @@ public:
 	/*! Get the field position of a specified field.
 	  \param field field to get
 	  \return position of field, 0 if no pos or not found */
-	unsigned short getPos(const unsigned short field) const
+	unsigned int getPos(const unsigned int field) const
 	{
 		Presence::const_iterator itr(_presence.find(field));
 		return itr != _presence.end() && itr->_field_traits.has(FieldTrait::position) ? itr->_pos : 0;
